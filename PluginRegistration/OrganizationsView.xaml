@@ -1,0 +1,38 @@
+<UserControl x:Class="Microsoft.Crm.Tools.PluginRegistration.OrganizationsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Microsoft.Crm.Tools.PluginRegistration"
+             xmlns:lib="clr-namespace:Microsoft.Crm.Tools.Libraries;assembly=CrmLibraries"
+             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+  <Grid x:Name="LayoutRoot">
+    <TabControl HorizontalAlignment="Stretch" Style="{DynamicResource SimpleTabStyle1}" VerticalAlignment="Stretch"
+                BorderThickness="1" BorderBrush="#FFAEAEAE"
+                ItemsSource="{Binding ListTabOrganizations, UpdateSourceTrigger=PropertyChanged}"
+                SelectedItem="{Binding SelectedOrganization}">
+      <FrameworkElement.Resources>
+        <lib:BoolToVisibility x:Key="buttonVisibility"/>
+        <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource SimpleTabItem}">
+          <Setter Property="Control.BorderThickness" Value="0,0,0,1"/>
+          <Setter Property="HeaderedContentControl.HeaderTemplate">
+            <Setter.Value>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal"
+                            ToolTip="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabItem}}, Path=Tag.LoggedOnUser.DomainName}">
+                  <TextBlock VerticalAlignment="Center" Margin="2,0" Padding="25,3" Text="{Binding}"/>
+                  <Button Name="CloseButton" Style="{StaticResource CloseFlatButtonStyle}"
+                          ContentTemplate="{DynamicResource DefaultButtonControlTemplate}" Content="r" Grid.Column="2"
+                          Margin="0,5,-3,0" HorizontalAlignment="Right"
+                          Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}, Path=DataContext.CmdCloseOrganization}"
+                          CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabItem}}, Path=Header}"
+                          Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabItem}}, Path=IsSelected, Converter={StaticResource buttonVisibility}}"/>
+                </StackPanel>
+              </DataTemplate>
+            </Setter.Value>
+          </Setter>
+        </Style>
+      </FrameworkElement.Resources>
+    </TabControl>
+  </Grid>
+</UserControl>

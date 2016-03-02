@@ -1,0 +1,130 @@
+<Window x:Class="Microsoft.Crm.Tools.PluginRegistration.SearchView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:UIResources="clr-namespace:Microsoft.Xrm.Tooling.Ui.Styles;assembly=Microsoft.Xrm.Tooling.Ui.Styles"
+        xmlns:local="clr-namespace:Microsoft.Crm.Tools.PluginRegistration"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:lib="clr-namespace:Microsoft.Crm.Tools.Libraries;assembly=CrmLibraries"
+        Name="SearchWindow" MinWidth="580" Width="580" MinHeight="360" Height="360" WindowStyle="None"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip"
+        Style="{DynamicResource WindowBorderStyling}" ShowInTaskbar="false"
+        FocusManager.FocusedElement="{Binding ElementName=TextSearch}">
+  <FrameworkElement.Resources>
+    <lib:NodeTypeToImageConverter x:Key="nodeTypeToImageConverter"/>
+    <lib:SearchExpandConverter x:Key="searchExpandConverter"/>
+  </FrameworkElement.Resources>
+  <i:Interaction.Behaviors>
+    <lib:WindowCloseBehaviour CloseButton="{Binding ElementName=CloseButton}"/>
+  </i:Interaction.Behaviors>
+  <i:Interaction.Triggers>
+    <i:EventTrigger EventName="Closing">
+      <ei:CallMethodAction MethodName="ClosingSearchWindow" TargetObject="{Binding}"/>
+    </i:EventTrigger>
+  </i:Interaction.Triggers>
+  <Grid x:Name="LayoutRoot" Margin="0,0,0,0">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="28"/>
+      <ColumnDefinition Width="461*"/>
+      <ColumnDefinition Width="73"/>
+      <ColumnDefinition Width="18"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="26"/>
+      <RowDefinition Height="44"/>
+      <RowDefinition Height="41"/>
+      <RowDefinition Height="10*"/>
+      <RowDefinition Height="40"/>
+      <RowDefinition Height="44"/>
+    </Grid.RowDefinitions>
+    <Button Name="CloseButton" Style="{StaticResource CloseFlatButtonStyle}"
+            ContentTemplate="{DynamicResource DefaultButtonControlTemplate}" Content="r" Grid.Column="3"
+            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,6,0,0" Height="12" Width="12"
+            IsCancel="true" WindowChrome.IsHitTestVisibleInChrome="true"/>
+    <TextBlock Margin="0,19,0,0" TextWrapping="Wrap" Text="Search Tree"
+               Style="{DynamicResource TextBlockStylePageHeading}" VerticalAlignment="Top"
+               HorizontalAlignment="Stretch" Grid.Column="1" Grid.RowSpan="2" Height="50" Grid.ColumnSpan="2"/>
+    <TextBox x:Name="TextSearch" Style="{DynamicResource TextBoxStyle}" Height="25" VerticalAlignment="Top"
+             TextWrapping="NoWrap" Grid.Column="1" HorizontalAlignment="Stretch" Grid.Row="2"
+             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+    <Button Name="btnSearch" Style="{DynamicResource RefreshButton}" IsDefault="true" Margin="3,0,0,0"
+            Height="25" Focusable="true" Content="Search" HorizontalAlignment="Stretch" VerticalAlignment="Top"
+            Grid.Column="2" Grid.Row="2" Command="{Binding SearchButtonCommand}"/>
+    <ContentControl VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="3"
+                    Grid.ColumnSpan="2">
+      <TreeView Margin="0,0,0,0" ItemsSource="{Binding SearchList}" Focusable="{Binding FocusableValue}">
+        <i:Interaction.Triggers>
+          <i:EventTrigger EventName="SelectedItemChanged">
+            <ei:CallMethodAction MethodName="SelectionChanged" TargetObject="{Binding}"/>
+          </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <FrameworkElement.Resources>
+          <Style TargetType="{x:Type TreeViewItem}">
+            <Setter Property="TreeViewItem.IsExpanded">
+              <Setter.Value>
+                <MultiBinding Converter="{StaticResource searchExpandConverter}">
+                  <Binding Path="DataContext.IsExpandedValue" Mode="OneWay"
+                           RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type TreeView}}"/>
+                  <Binding Path="IsNodeExpanded" Mode="OneWay"/>
+                </MultiBinding>
+              </Setter.Value>
+            </Setter>
+            <Setter Property="TreeViewItem.IsSelected" Value="{Binding IsNodeSelected, Mode=OneWay}"/>
+            <Setter Property="Control.Template" Value="{DynamicResource TreeViewItemControlTemplate}"/>
+            <Style.Triggers>
+              <Trigger Property="TreeViewItem.IsSelected" Value="true">
+                <Setter Property="lib:TreeViewItemBehavior.BringIntoViewWhenSelected" Value="true"/>
+              </Trigger>
+            </Style.Triggers>
+          </Style>
+          <DataTemplate x:Key="SharedHierarchicalTemplate">
+            <StackPanel Orientation="Horizontal">
+              <Image Focusable="false" Width="16" Height="16"
+                     Source="{Binding Converter={StaticResource nodeTypeToImageConverter}}"/>
+              <TextBlock Focusable="false" FontFamily="Seguoe UI Regular" FontSize="12" Foreground="#FF000000"
+                         Padding="5,4,10,4" Text="{Binding NodeText}"/>
+            </StackPanel>
+          </DataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmPluginAssembly}}" DataType="{x:Type lib:CrmPluginAssembly}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmPlugin}}" DataType="{x:Type lib:CrmPlugin}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmPluginStep}}" DataType="{x:Type lib:CrmPluginStep}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmProfiledProcess}}"
+                                    DataType="{x:Type lib:CrmProfiledProcess}" ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmPluginImage}}" DataType="{x:Type lib:CrmPluginImage}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmServiceEndpoint}}"
+                                    DataType="{x:Type lib:CrmServiceEndpoint}" ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmTreeNode}}" DataType="{x:Type lib:CrmTreeNode}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+        </FrameworkElement.Resources>
+      </TreeView>
+    </ContentControl>
+    <StackPanel Style="{DynamicResource BottomActionsStackPanel}" Grid.Row="5" Grid.ColumnSpan="4">
+      <Button Content="Se_lect on Main Form" HorizontalAlignment="Right" Margin="0,10,110,20"
+              VerticalAlignment="Bottom" Style="{DynamicResource OrgBottomButtonStyle}" Grid.Column="1"
+              Grid.Row="2" Height="25" Command="{Binding SelectButtonCommand}"/>
+      <Button Style="{DynamicResource OrgBottomButtonStyle}" Content="_Cancel" HorizontalAlignment="Right"
+              VerticalAlignment="Bottom" Margin="0,-45,18,20" Grid.Column="1" Grid.Row="2" Height="25"
+              Command="{Binding CancelButtonCommand}"/>
+    </StackPanel>
+  </Grid>
+</Window>

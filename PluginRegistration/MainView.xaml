@@ -1,0 +1,138 @@
+<Window x:Class="Microsoft.Crm.Tools.PluginRegistration.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:local="clr-namespace:Microsoft.Crm.Tools.PluginRegistration"
+        xmlns:lib="clr-namespace:Microsoft.Crm.Tools.Libraries;assembly=CrmLibraries"
+        xmlns:UIResources="clr-namespace:Microsoft.Xrm.Tooling.Ui.Styles;assembly=Microsoft.Xrm.Tooling.Ui.Styles"
+        MinWidth="960" MinHeight="720" BorderThickness="1" ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Icon="/PluginRegistration;component/New Images/dynamics16-32-48-256.ico" Title="{Binding Title}"
+        IsEnabled="{Binding IsMainViewEnabled}">
+  <UIElement.InputBindings>
+    <KeyBinding Key="A" Modifiers="Control"
+                Command="{Binding SelectedOrganization.AssemblyRegistrationMenuShortCut}"/>
+    <KeyBinding Key="T" Modifiers="Control" Command="{Binding SelectedOrganization.StepRegistrationMenuShortCut}"/>
+    <KeyBinding Key="I" Modifiers="Control" Command="{Binding SelectedOrganization.ImageRegistrationMenuShortCut}"/>
+    <KeyBinding Key="F" Modifiers="Control" Command="{Binding SelectedOrganization.SearchMenuShortCut}"/>
+    <KeyBinding Key="E" Modifiers="Control"
+                Command="{Binding SelectedOrganization.ServiceEndPointRegistrationMenuShortCut}"/>
+    <KeyBinding Gesture="Ctrl+Shift+A" Command="{Binding SelectedOrganization.DisplayByAssemblyMenuShortCut}"/>
+    <KeyBinding Gesture="Ctrl+Shift+E" Command="{Binding SelectedOrganization.DisplayByEntityMenuShortCut}"/>
+    <KeyBinding Gesture="Ctrl+Shift+M" Command="{Binding SelectedOrganization.DisplayByMessageMenuShortCut}"/>
+    <KeyBinding Key="F5" Command="{Binding SelectedOrganization.RefreshMenuShortCut}"/>
+  </UIElement.InputBindings>
+  <FrameworkElement.Style>
+    <Style TargetType="{x:Type Window}">
+      <Setter Property="WindowChrome.WindowChrome">
+        <Setter.Value>
+          <WindowChrome CaptionHeight="20" CornerRadius="0" GlassFrameThickness="0,0,0,0" NonClientFrameEdges="None"
+                        ResizeBorderThickness="5" UseAeroCaptionButtons="true"/>
+        </Setter.Value>
+      </Setter>
+      <Setter Property="Window.WindowStyle" Value="None"/>
+      <Setter Property="Control.Background" Value="{x:Static SystemColors.ActiveCaptionBrush}"/>
+      <Setter Property="Control.BorderBrush" Value="#FFCCCCCC"/>
+      <Setter Property="Control.BorderThickness" Value="1"/>
+      <Setter Property="Border.Background" Value="White"/>
+    </Style>
+  </FrameworkElement.Style>
+  <FrameworkElement.Resources>
+    <lib:ImageConverter x:Key="imageConverter"/>
+  </FrameworkElement.Resources>
+  <Grid x:Name="LayoutRoot" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="{x:Null}">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="25"/>
+      <RowDefinition Height="40"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="27"/>
+    </Grid.RowDefinitions>
+    <Border BorderBrush="#FFC3C3C3" BorderThickness="0,0,0,1">
+      <Grid Name="CloseControls">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="30"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="50"/>
+        </Grid.ColumnDefinitions>
+        <Image Width="20" Height="19" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Column="0"
+               Source="{Binding ImgCRMLogo, Converter={StaticResource imageConverter}}"/>
+        <TextBlock HorizontalAlignment="Center" Margin="0,4,0,0" TextWrapping="Wrap" VerticalAlignment="Top"
+                   Grid.Column="1" Text="{Binding Title}"/>
+        <UIResources:controlButtons Grid.Column="2" Control.Background="White" Control.HorizontalContentAlignment="Right"
+                                    Control.VerticalContentAlignment="Center" Control.BorderThickness="0,0,0,1"
+                                    Control.Padding="0,0,10,0" WindowChrome.IsHitTestVisibleInChrome="true"
+                                    Control.BorderBrush="{x:Null}"/>
+      </Grid>
+    </Border>
+    <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Row="1">
+      <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="7,0,0,0"
+                  IsEnabled="{Binding IsToolbarEnabled}">
+        <Button Style="{DynamicResource MainViewButtonStyle}" Command="{Binding CmdConnectionNew}">
+          <ContentControl.Content>
+            <StackPanel Orientation="Horizontal">
+              <Image Width="16" Height="16" Margin="3"
+                     Source="{Binding ImgCreateConnection, Converter={StaticResource imageConverter}}"/>
+              <TextBlock Text="CREATE NEW CONNECTION" VerticalAlignment="Center" Padding="0,0,5,0"
+                         HorizontalAlignment="Left"/>
+            </StackPanel>
+          </ContentControl.Content>
+        </Button>
+        <Button Style="{DynamicResource MainViewButtonStyle}" Command="{Binding CmdConnectionRefresh}">
+          <ContentControl.Content>
+            <StackPanel Orientation="Horizontal">
+              <Image Width="16" Height="16" Margin="3"
+                     Source="{Binding ImgReloadOrganizations, Converter={StaticResource imageConverter}}"/>
+              <TextBlock Text="RELOAD ORGANIZATIONS" VerticalAlignment="Center" Padding="0,0,5,0" HorizontalAlignment="Left"/>
+            </StackPanel>
+          </ContentControl.Content>
+        </Button>
+        <Separator Width="20" Height="2" RenderTransformOrigin="0.5,0.5" Margin="-5,2,-5,5">
+          <UIElement.RenderTransform>
+            <TransformGroup>
+              <ScaleTransform/>
+              <SkewTransform/>
+              <RotateTransform Angle="90"/>
+              <TranslateTransform/>
+            </TransformGroup>
+          </UIElement.RenderTransform>
+        </Separator>
+        <Button Style="{DynamicResource MainViewButtonStyle}" Command="{Binding CmdProfilerReplay}">
+          <ContentControl.Content>
+            <StackPanel Orientation="Horizontal">
+              <Image Width="16" Height="16" Margin="3"
+                     Source="{Binding ImgReplayPlugin, Converter={StaticResource imageConverter}}"/>
+              <TextBlock Text="REPLAY PLUG-IN EXECUTION" VerticalAlignment="Center" Padding="0,0,5,0"
+                         HorizontalAlignment="Left"/>
+            </StackPanel>
+          </ContentControl.Content>
+        </Button>
+        <Button Style="{DynamicResource MainViewButtonStyle}" Command="{Binding CmdPluginProfile}">
+          <ContentControl.Content>
+            <StackPanel Orientation="Horizontal">
+              <Image Width="16" Height="16" Margin="3"
+                     Source="{Binding ImgViewPlugin, Converter={StaticResource imageConverter}}"/>
+              <TextBlock Text="VIEW PLUG-IN PROFILE" VerticalAlignment="Center" Padding="0,0,5,0" HorizontalAlignment="Left"/>
+            </StackPanel>
+          </ContentControl.Content>
+        </Button>
+      </StackPanel>
+      <Button Width="20" Height="20" HorizontalAlignment="Right" Style="{DynamicResource MainViewButtonStyle}"
+              Margin="0,10,37,10" Command="{Binding CmdSettings}">
+        <Image Source="{Binding ImgSettings, Converter={StaticResource imageConverter}}"/>
+      </Button>
+      <Button Width="20" Height="20" HorizontalAlignment="Right" Style="{DynamicResource MainViewButtonStyle}"
+              Margin="0,10,12,10" Command="{Binding CmdHelp}">
+        <Image Source="{Binding ImgHelp, Converter={StaticResource imageConverter}}"/>
+      </Button>
+    </Grid>
+    <local:OrganizationsView BorderThickness="0" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                             Margin="12,10,12,12" DataContext="{Binding OrganizationsTab}"/>
+    <Grid Row="3" Background="#FFEAEAEA">
+      <Label HorizontalAlignment="Right" Margin="0,0,10,0" Content="{Binding OrganizationStatus}"
+             Visibility="{Binding OrganizationStatusVisible}"/>
+    </Grid>
+  </Grid>
+</Window>

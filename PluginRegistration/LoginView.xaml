@@ -1,0 +1,39 @@
+<Window x:Class="Microsoft.Crm.Tools.PluginRegistration.LoginView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Microsoft.Crm.Tools.PluginRegistration"
+        xmlns:login="clr-namespace:Microsoft.Xrm.Tooling.CrmConnectControl;assembly=Microsoft.Xrm.Tooling.CrmConnectControl"
+        xmlns:lib="clr-namespace:Microsoft.Crm.Tools.Libraries;assembly=CrmLibraries"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ie="http://schemas.microsoft.com/expression/2010/interactions"
+        x:Name="LoginWindow" Width="500" ResizeMode="NoResize" Height="500"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="false"
+        Style="{DynamicResource WindowBorderStyling}">
+  <i:Interaction.Behaviors>
+    <lib:WindowCloseBehaviour CloseButton="{Binding ElementName=CloseButton}"/>
+  </i:Interaction.Behaviors>
+  <i:Interaction.Triggers>
+    <i:EventTrigger EventName="Loaded">
+      <ie:CallMethodAction MethodName="Login_Load" TargetObject="{Binding}"/>
+    </i:EventTrigger>
+  </i:Interaction.Triggers>
+  <Grid x:Name="LayoutRoot">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="498"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="26"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <Button Name="CloseButton" Style="{DynamicResource CloseFlatButtonStyle}"
+            ContentTemplate="{DynamicResource DefaultButtonControlTemplate}" Content="r"
+            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="480,6,0,0" Height="12" Width="12"
+            WindowChrome.IsHitTestVisibleInChrome="true"/>
+    <login:CrmServerLoginControl UserCancelClicked="CrmLoginCtrl_OnUserCancelClicked"
+                                 ConnectionCheckBegining="CrmLoginCtrl_ConnectionCheckBegining"
+                                 ConnectionStatusEvent="CrmLoginCtrl_ConnectionStatusEvent" Name="CrmLoginCtrl" Grid.Row="1"
+                                 Margin="20,0"/>
+  </Grid>
+</Window>

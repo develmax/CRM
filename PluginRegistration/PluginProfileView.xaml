@@ -1,0 +1,97 @@
+<Window x:Class="Microsoft.Crm.Tools.PluginRegistration.PluginProfileView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:UIResources="clr-namespace:Microsoft.Xrm.Tooling.Ui.Styles;assembly=Microsoft.Xrm.Tooling.Ui.Styles"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ie="http://schemas.microsoft.com/expression/2010/interactions"
+        xmlns:lib="clr-namespace:Microsoft.Crm.Tools.Libraries;assembly=CrmLibraries"
+        xmlns:local="clr-namespace:Microsoft.Crm.Tools.PluginRegistration"
+        xmlns:uc="clr-namespace:Microsoft.Crm.Tools.PluginRegistration.CommonControls;assembly=PluginCommonControls"
+        Closed="Window_Closed" Title="View Plug-in Profile" MinWidth="550" Width="550" MinHeight="340"
+        ResizeMode="NoResize" Height="340" WindowStyle="None" WindowStartupLocation="CenterOwner"
+        Style="{DynamicResource WindowBorderStyling}" ShowInTaskbar="false">
+  <i:Interaction.Behaviors>
+    <lib:WindowCloseBehaviour CloseButton="{Binding ElementName=CloseButton}"/>
+  </i:Interaction.Behaviors>
+  <Grid x:Name="LayoutRoot" Margin="0,0,0,0">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="28"/>
+      <ColumnDefinition Width="200*"/>
+      <ColumnDefinition Width="18"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="26"/>
+      <RowDefinition Height="42"/>
+      <RowDefinition Height="212"/>
+      <RowDefinition/>
+      <RowDefinition Height="44"/>
+    </Grid.RowDefinitions>
+    <Button Name="CloseButton" Style="{StaticResource CloseFlatButtonStyle}"
+            ContentTemplate="{DynamicResource DefaultButtonControlTemplate}" Content="r" Grid.Column="2"
+            HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,6,0,0" Height="12" Width="12"
+            IsCancel="true" WindowChrome.IsHitTestVisibleInChrome="true"/>
+    <TextBlock Style="{DynamicResource TextBlockStylePageHeading}" VerticalAlignment="Stretch" TextWrapping="Wrap"
+               Text="Plugin Profile" HorizontalAlignment="Stretch" Grid.Column="1" Grid.Row="1"/>
+    <GroupBox Header="" Grid.Row="2" BorderThickness="0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
+              Margin="0,0,0,0" Grid.Column="1" Height="211">
+      <Grid Margin="-5,-5,0,0">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="32*"/>
+          <RowDefinition Height="60"/>
+          <RowDefinition Height="130*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Style="{DynamicResource SteptextStyle}" Margin="0,0,0,0" TextWrapping="Wrap"
+                   Text="Specify Log Location" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+        <TextBlock Margin="0 21 0 0"
+                   Text="To collect the log, do the action that triggers the plug-in. When the exception occurs, download the error log and specify the path below."
+                   TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1"/>
+        <Grid Row="3">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="7"/>
+            <RowDefinition Height="31"/>
+            <RowDefinition Height="23"/>
+            <RowDefinition Height="69"/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="90"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Text="Log Location:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" TextWrapping="Wrap"
+                     HorizontalAlignment="Stretch"/>
+          <uc:FileBrowserView PathChanged="fileBrowser_PathChanged_1" x:Name="fileBrowser" Grid.Row="1" DefaultExtension=""
+                              DialogTitle="" Filter="All Profile Types (*.log, *.txt, *.xml)|*.log;*.txt;*.xml|All files|*.*"
+                              Margin="0,0,0,23" Grid.Column="1" Grid.RowSpan="2"/>
+          <TextBlock Grid.Column="0" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                     Foreground="#FF666666"
+                     Text="WARNING: The Profile may contain sensitive information. The &quot;View&quot; button creates a temporary file that will remain after you have closed the profile. For such cases, click Save to save the profile in a secure location."
+                     RenderTransformOrigin="0,0" Grid.ColumnSpan="2" Grid.Row="3"/>
+        </Grid>
+      </Grid>
+    </GroupBox>
+    <StackPanel Style="{DynamicResource BottomActionsStackPanel}" Grid.Row="4" Grid.ColumnSpan="3" Height="Auto">
+      <Button x:Name="btnView" Content="View" Style="{DynamicResource OrgBottomButtonStyle}"
+              HorizontalAlignment="Right" Margin="0,10,190,5" VerticalAlignment="Top"
+              IsEnabled="{Binding ViewButtonEnable, UpdateSourceTrigger=PropertyChanged}">
+        <i:Interaction.Triggers>
+          <i:EventTrigger EventName="Click">
+            <ie:CallMethodAction MethodName="ViewButton_Click" TargetObject="{Binding}"/>
+          </i:EventTrigger>
+        </i:Interaction.Triggers>
+      </Button>
+      <Button x:Name="btnSave" Content="Save" Style="{DynamicResource OrgBottomButtonStyle}"
+              HorizontalAlignment="Right" Margin="16,-30,105,5" VerticalAlignment="Top"
+              IsEnabled="{Binding SaveButtonEnable, UpdateSourceTrigger=PropertyChanged}">
+        <i:Interaction.Triggers>
+          <i:EventTrigger EventName="Click">
+            <ie:CallMethodAction MethodName="SaveButton_Click" TargetObject="{Binding}"/>
+          </i:EventTrigger>
+        </i:Interaction.Triggers>
+      </Button>
+      <Button x:Name="btnClose" Style="{DynamicResource OrgBottomButtonStyle}" Content="Close"
+              HorizontalAlignment="Right" Margin="16,-30,18,5" VerticalAlignment="Top"
+              Command="{Binding CmdClose}"/>
+    </StackPanel>
+  </Grid>
+</Window>

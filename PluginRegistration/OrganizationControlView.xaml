@@ -1,0 +1,263 @@
+<UserControl x:Class="Microsoft.Crm.Tools.PluginRegistration.OrganizationControlView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+             xmlns:UIResources="clr-namespace:Microsoft.Xrm.Tooling.Ui.Styles;assembly=Microsoft.Xrm.Tooling.Ui.Styles"
+             xmlns:local="clr-namespace:Microsoft.Crm.Tools.PluginRegistration"
+             xmlns:lib="clr-namespace:Microsoft.Crm.Tools.Libraries;assembly=CrmLibraries"
+             HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White"
+             ScrollViewer.CanContentScroll="true">
+  <FrameworkElement.Resources>
+    <lib:BindingProxy x:Key="bindingProxy" Data="{Binding CrmDefaultContextMenuSource}"/>
+    <lib:BindingProxy x:Key="cmdBindingProxy" Data="{Binding CmdMenuItems}"/>
+    <lib:ImageConverter x:Key="imageConverter"/>
+    <lib:NodeTypeToImageConverter x:Key="nodeTypeToImageConverter"/>
+    <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
+      <Setter Property="TreeViewItem.IsSelected" Value="{Binding IsNodeSelected, Mode=TwoWay}"/>
+      <Setter Property="TreeViewItem.IsExpanded" Value="{Binding IsNodeExpanded, Mode=TwoWay}"/>
+      <Setter Property="Control.Template" Value="{DynamicResource TreeViewItemControlTemplate}"/>
+      <Style.Triggers>
+        <Trigger Property="TreeViewItem.IsSelected" Value="true">
+          <Setter Property="lib:TreeViewItemBehavior.BringIntoViewWhenSelected" Value="true"/>
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+  </FrameworkElement.Resources>
+  <FrameworkElement.ContextMenu>
+    <ContextMenu ItemsSource="{Binding Path=Data, Source={StaticResource bindingProxy}}">
+      <FrameworkElement.Resources>
+        <ControlTemplate x:Key="MenuSeparatorTemplate">
+          <Grid>
+            <Separator/>
+          </Grid>
+        </ControlTemplate>
+        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource SimpleMenuItem}">
+          <Setter Property="MenuItem.Command" Value="{Binding Path=Data, Source={StaticResource cmdBindingProxy}}"/>
+          <Setter Property="MenuItem.CommandParameter" Value="{Binding Name}"/>
+          <Setter Property="UIElement.IsEnabled" Value="{Binding IsEnabled}"/>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding}" Value="{x:Null}">
+              <Setter Property="Control.Template" Value="{StaticResource MenuSeparatorTemplate}"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+        <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmMenuItems}}" DataType="{x:Type lib:CrmMenuItems}"
+                                  ItemsSource="{Binding CrmMenuSubItems}">
+          <ContentPresenter>
+            <ContentPresenter.Content>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="20"/>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Image Stretch="UniformToFill" Grid.Column="0" Width="16" Height="16" VerticalAlignment="Center"
+                       Source="{Binding ImagePath, Converter={StaticResource imageConverter}}"/>
+                <Label Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                       VerticalContentAlignment="Center" Padding="1,2" Content="{Binding Name}"/>
+                <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="10,0,1,0"
+                           Text="{Binding InputGestureText}"/>
+              </Grid>
+            </ContentPresenter.Content>
+          </ContentPresenter>
+        </HierarchicalDataTemplate>
+      </FrameworkElement.Resources>
+    </ContextMenu>
+  </FrameworkElement.ContextMenu>
+  <Grid x:Name="LayoutRoot">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="40"/>
+      <RowDefinition Height="400*"/>
+      <RowDefinition Height="3"/>
+      <RowDefinition Height="{Binding DetailsTabHeight, Mode=TwoWay}"/>
+    </Grid.RowDefinitions>
+    <Grid Row="0" VerticalAlignment="Top" Height="30">
+      <Menu HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+            ItemsSource="{Binding Path=CrmMenuItemSource}" Background="{x:Null}">
+        <FrameworkElement.Resources>
+          <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource SimpleMenuItem}">
+            <Setter Property="MenuItem.IsCheckable" Value="{Binding IsCheckable}"/>
+            <Setter Property="UIElement.IsEnabled" Value="{Binding IsEnabled}"/>
+            <Setter Property="MenuItem.IsChecked" Value="{Binding IsSelected}"/>
+            <Setter Property="MenuItem.Command"
+                    Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Menu}}, Path=DataContext.CmdMenuItems}"/>
+            <Setter Property="MenuItem.CommandParameter" Value="{Binding Name}"/>
+          </Style>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmMenuItems}}" DataType="{x:Type lib:CrmMenuItems}"
+                                    ItemsSource="{Binding CrmMenuSubItems}">
+            <ContentPresenter Margin="0,0,0,0">
+              <ContentPresenter.Content>
+                <Grid Background="Transparent">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <Image Stretch="UniformToFill" Grid.Column="0" Width="16" Height="16" VerticalAlignment="Center"
+                         Source="{Binding ImagePath, Converter={StaticResource imageConverter}}"/>
+                  <Label Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                         VerticalContentAlignment="Center" Padding="1,2" Content="{Binding Name}"/>
+                  <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="5,0,1,0"
+                             Text="{Binding InputGestureText}"/>
+                </Grid>
+              </ContentPresenter.Content>
+            </ContentPresenter>
+          </HierarchicalDataTemplate>
+        </FrameworkElement.Resources>
+      </Menu>
+    </Grid>
+    <Grid Row="1">
+      <TextBlock Margin="15,10,0,0" Text="Registered Plugins &amp; Custom Workflow Activities"
+                 Style="{DynamicResource SteptextStyle}" VerticalAlignment="Top"/>
+      <TreeView BorderThickness="0" Margin="22,45,2,10" ItemContainerStyle="{DynamicResource TreeViewItemStyle}"
+                ItemsSource="{Binding AssembliesTree}">
+        <UIElement.InputBindings>
+          <KeyBinding Key="Delete" Command="{Binding UnregisterMenuShortCut}"/>
+        </UIElement.InputBindings>
+        <i:Interaction.Triggers>
+          <i:EventTrigger EventName="SelectedItemChanged">
+            <ei:CallMethodAction MethodName="SelectionChanged" TargetObject="{Binding}"/>
+          </i:EventTrigger>
+          <i:EventTrigger EventName="MouseDoubleClick">
+            <ei:CallMethodAction MethodName="MouseDoubleClick" TargetObject="{Binding}"/>
+          </i:EventTrigger>
+        </i:Interaction.Triggers>
+        <FrameworkElement.Resources>
+          <lib:BindingProxy x:Key="bindingProxy" Data="{Binding CrmContextMenuSource}"/>
+          <lib:BindingProxy x:Key="cmdBindingProxy" Data="{Binding CmdMenuItems}"/>
+          <DataTemplate x:Key="SharedHierarchicalTemplate">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Background="Transparent">
+              <i:Interaction.Triggers>
+                <i:EventTrigger EventName="PreviewMouseRightButtonDown">
+                  <ei:ChangePropertyAction PropertyName="IsSelected" Value="True"
+                                        TargetObject="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}}"/>
+                </i:EventTrigger>
+              </i:Interaction.Triggers>
+              <Image Focusable="false" Stretch="UniformToFill" Width="16" Height="16"
+                     Source="{Binding Converter={StaticResource nodeTypeToImageConverter}}"/>
+              <TextBlock Focusable="false" FontFamily="Seguoe UI Regular" FontSize="12" Foreground="#FF000000"
+                         Padding="5,4,10,4" Text="{Binding NodeText}"/>
+              <FrameworkElement.ContextMenu>
+                <ContextMenu ItemsSource="{Binding Path=Data, Source={StaticResource bindingProxy}}">
+                  <FrameworkElement.Resources>
+                    <ControlTemplate x:Key="MenuSeparatorTemplate">
+                      <Grid>
+                        <Separator/>
+                      </Grid>
+                    </ControlTemplate>
+                    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource SimpleMenuItem}">
+                      <Setter Property="MenuItem.Command" Value="{Binding Path=Data, Source={StaticResource cmdBindingProxy}}"/>
+                      <Setter Property="MenuItem.CommandParameter" Value="{Binding Name}"/>
+                      <Setter Property="UIElement.IsEnabled" Value="{Binding IsEnabled}"/>
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                          <Setter Property="Control.Template" Value="{StaticResource MenuSeparatorTemplate}"/>
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                    <HierarchicalDataTemplate DataType="{x:Type lib:CrmMenuItems}" ItemsSource="{Binding CrmMenuSubItems}"
+                                              x:Key="{DataTemplateKey {x:Type lib:CrmMenuItems}}">
+                      <ContentPresenter>
+                        <ContentPresenter.Content>
+                          <Grid>
+                            <Grid.ColumnDefinitions>
+                              <ColumnDefinition Width="20"/>
+                              <ColumnDefinition Width="*"/>
+                              <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Image Stretch="UniformToFill" Grid.Column="0" Width="16" Height="16" VerticalAlignment="Center"
+                                   Source="{Binding ImagePath, Converter={StaticResource imageConverter}}"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                                   VerticalContentAlignment="Center" Padding="1,2" Content="{Binding Name}"/>
+                            <TextBlock Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="10,0,1,0"
+                                       Text="{Binding InputGestureText}"/>
+                          </Grid>
+                        </ContentPresenter.Content>
+                      </ContentPresenter>
+                    </HierarchicalDataTemplate>
+                  </FrameworkElement.Resources>
+                </ContextMenu>
+              </FrameworkElement.ContextMenu>
+            </StackPanel>
+          </DataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmPluginAssembly}}" DataType="{x:Type lib:CrmPluginAssembly}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}"
+                            HorizontalAlignment="Stretch" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmPlugin}}" DataType="{x:Type lib:CrmPlugin}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}"
+                            HorizontalAlignment="Stretch" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmPluginStep}}" DataType="{x:Type lib:CrmPluginStep}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}"
+                            HorizontalAlignment="Stretch" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmProfiledProcess}}"
+                                    DataType="{x:Type lib:CrmProfiledProcess}" ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}"
+                            HorizontalAlignment="Stretch" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmPluginImage}}" DataType="{x:Type lib:CrmPluginImage}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}"
+                            HorizontalAlignment="Stretch" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmServiceEndpoint}}"
+                                    DataType="{x:Type lib:CrmServiceEndpoint}" ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}"
+                            HorizontalAlignment="Stretch" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+          <HierarchicalDataTemplate x:Key="{DataTemplateKey {x:Type lib:CrmTreeNode}}" DataType="{x:Type lib:CrmTreeNode}"
+                                    ItemsSource="{Binding NodeChildren}">
+            <ContentControl Focusable="false" ContentTemplate="{StaticResource SharedHierarchicalTemplate}"
+                            HorizontalAlignment="Stretch" Content="{Binding}"/>
+          </HierarchicalDataTemplate>
+        </FrameworkElement.Resources>
+      </TreeView>
+    </Grid>
+    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Margin="-4,0" VerticalAlignment="Center"
+                  BorderBrush="#FFAEAEAE" BorderThickness="0,1,0,0" ShowsPreview="true" Height="1"
+                  Background="{x:Null}"/>
+    <Grid Row="3" Background="#EAEAEA" Margin="-4,-1" VerticalAlignment="Stretch"
+          HorizontalAlignment="Stretch">
+      <TabControl HorizontalAlignment="Stretch" Style="{DynamicResource DetailsTabControl}"
+                  VerticalAlignment="Stretch" Padding="-1,0" IsSynchronizedWithCurrentItem="True">
+        <FrameworkElement.Resources>
+          <Style TargetType="{x:Type TabItem}">
+            <Setter Property="HeaderedContentControl.HeaderTemplate">
+              <Setter.Value>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Text="{Binding}"/>
+                  </StackPanel>
+                </DataTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </FrameworkElement.Resources>
+        <TabItem Style="{DynamicResource DetailsTabItem}" Header="Properties">
+          <Grid>
+            <WindowsFormsHost FrameworkElement.Margin="10,15,10,15" Background="White">
+              <wf:PropertyGrid x:Name="propGridEntity"/>
+            </WindowsFormsHost>
+          </Grid>
+        </TabItem>
+        <TabItem Style="{DynamicResource DetailsTabItem}" Header="Details" IsSelected="true" BorderBrush="{x:Null}">
+          <Grid Background="White">
+            <DataGrid Name="DetailsGrid" CanUserAddRows="false" Margin="10,15,10,2" IsReadOnly="true" Background="White"
+                      BorderThickness="0" HeadersVisibility="Column" CanUserReorderColumns="false"
+                      CanUserResizeRows="false" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                      GridLinesVisibility="None" ItemsSource="{Binding GridTable}"/>
+          </Grid>
+        </TabItem>
+      </TabControl>
+    </Grid>
+  </Grid>
+</UserControl>
